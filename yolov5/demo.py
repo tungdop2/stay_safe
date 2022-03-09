@@ -25,7 +25,7 @@ IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 def make_parser():
     parser = argparse.ArgumentParser("ByteTrack Demo!")
     parser.add_argument(
-        "demo", default="image", help="demo type, eg. image, video and webcam"
+        "demo", default="image", help="demo type, eg. video and webcam"
     )
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
 
@@ -68,9 +68,9 @@ def make_parser():
     parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
-    parser.add_argument('--min-box-area', type=float, default=10, help='filter out tiny boxes')
+    parser.add_argument('--min-box-area', type=float, default=0, help='filter out tiny boxes')
     parser.add_argument(
-        "--aspect_ratio_thresh", type=float, default=2,
+        "--aspect_ratio_thresh", type=float, default=10,
         help="threshold for filtering out boxes of which aspect ratio are above the given value."
     )
     return parser
@@ -146,76 +146,20 @@ class Predictor(object):
             outputs = self.model(img, False, False)
             # if self.decoder is not None:
             #     outputs = self.decoder(outputs, dtype=outputs.type())
-            print('before nms:', outputs.size())
+            # print('before nms:', outputs.size())
             outputs = postprocess(outputs, self.num_classes, self.confthre, self.nmsthre)
-            print('after nms:', outputs[0].size())
-            heads = [output for output in outputs.cpu().numpy() if output[6] == 0]
-            print('heads', len(heads))
+            # print('after nms:', outputs[0].size())
+            outputs = outputs[0].cpu().numpy()
+            heads = [output for output in outputs if output[6] == 0]
             heads = np.array(heads)
-            heads = torch.from_numpy(heads).to(self.device)
-            faces = [output for output in outputs.cpu().numpy() if output[6] == 1]
-            print('faces:', len(faces))
+            heads = torch.from_numpy(heads).to('cuda' if self.device == 'gpu' else 'cpu')
+            faces = [output for output in outputs if output[6] == 1 and output[4] > 0.4]
             faces = np.array(faces)
-            faces = torch.from_numpy(faces).to(self.device)
+            faces = torch.from_numpy(faces).to('cuda' if self.device == 'gpu' else 'cpu')
 
             outputs = [heads, faces]
             timer.toc()
         return outputs, img_info
-
-
-def image_demo(predictor, vis_folder, path, current_time, save_result, save_name, test_size):
-    if os.path.isdir(path):
-        files = get_image_list(path)
-    else:
-        files = [path]
-    files.sort(key=lambda x: int(x.split('/')[-1][:-4]))
-    tracker = BYTETracker(args, frame_rate=30)
-    timer = Timer()
-    frame_id = 0
-    results = []
-    for image_name in files:
-        if frame_id % 20 == 0:
-            logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
-        outputs, img_info = predictor.inference(image_name, timer)
-        if outputs[0] is not None:
-            online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
-            # print('height:', img_info['height'], 'width:', img_info['width'])
-            # print('test size:', exp.test_size)
-            print('People count:', len(online_targets))
-            # print(online_targets)
-            online_tlwhs = []
-            online_ids = []
-            online_scores = []
-            for t in online_targets:
-                tlwh = t.tlwh
-                tid = t.track_id
-                vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
-                if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                    online_tlwhs.append(tlwh)
-                    online_ids.append(tid)
-                    online_scores.append(t.score)
-            # save results
-            results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
-            timer.toc()
-            online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
-                                      fps=1. / timer.average_time)
-        else:
-            timer.toc()
-            online_im = img_info['raw_img']
-
-        save_folder = os.path.join(
-            vis_folder, save_name
-        )
-        if not os.path.exists(save_folder):
-            os.makedirs(save_folder)
-        save_file_name = os.path.join(save_folder, os.path.basename(image_name))
-        print("Save tracked image to {}".format(save_file_name))
-        cv2.imwrite(save_file_name, online_im)
-        ch = cv2.waitKey(0)
-        frame_id += 1
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            break
-
 
 def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
@@ -238,7 +182,6 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     tracker = BYTETracker(args, frame_rate=30)
     timer = Timer()
     frame_id = 0
-    results = []
     while True:
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
@@ -262,15 +205,20 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                         online_tlwhs.append(tlwh)
                         online_ids.append(tid)
                         online_scores.append(t.score)
-                results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
+                # face
+                faces_tlwhs = outputs[1].cpu().numpy()
+                faces_tlwhs = faces_tlwhs[:, :4]
+                faces_tlwhs[:, 2] = faces_tlwhs[:, 2] - faces_tlwhs[:, 0]
+                faces_tlwhs[:, 3] = faces_tlwhs[:, 3] - faces_tlwhs[:, 1]
+                faces_tlwhs[:, 0] = faces_tlwhs[:, 0] * img_info['width'] / test_size[1]
+                faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
                 timer.toc()
-                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
-                                          fps=1. / timer.average_time)
+                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, frame_id=frame_id + 1,
+                                        fps=1. / timer.average_time)
             else:
                 timer.toc()
                 online_im = img_info['raw_img']
-            if args.save_result:
-                vid_writer.write(online_im)
+            vid_writer.write(online_im)
             # cv2.imshow("online_im", online_im)
             ch = cv2.waitKey(1)
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
@@ -314,10 +262,7 @@ def main(args):
 
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, trt_file, args.device, args.fp16)
     current_time = time.localtime()
-    if args.demo == "image":
-        image_demo(predictor, vis_folder, args.path, current_time, args.save_name, test_size)
-    elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args, test_size)
+    imageflow_demo(predictor, vis_folder, current_time, args, test_size)
 
 
 if __name__ == "__main__":
