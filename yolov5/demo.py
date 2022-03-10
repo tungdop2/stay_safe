@@ -212,6 +212,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] - faces_tlwhs[:, 1]
                 faces_tlwhs[:, 0] = faces_tlwhs[:, 0] * img_info['width'] / test_size[1]
                 faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
+                print(faces_tlwhs)
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, frame_id=frame_id + 1,
                                         fps=1. / timer.average_time)
