@@ -212,7 +212,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] - faces_tlwhs[:, 1]
                 faces_tlwhs[:, 0] = faces_tlwhs[:, 0] * img_info['width'] / test_size[1]
                 faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
-                print(faces_tlwhs)
+                faces_tlwhs[:, 2] = faces_tlwhs[:, 2] * img_info['width'] / test_size[1]
+                faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
+                # crop faces
+                for face_id, face in enumerate(faces_tlwhs[:1]):
+                    face_img = frame[int(face[1]):int(face[1] + face[3]), int(face[0]):int(face[0] + face[2])]
+                    if face_img.shape[0] * face_img.shape[1] > 0:
+                        cv2.imwrite(os.path.join(save_folder, 'face_' + str(face_id) + '_' + str(frame_id) + '.jpg'), face_img)
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, frame_id=frame_id + 1,
                                         fps=1. / timer.average_time)
