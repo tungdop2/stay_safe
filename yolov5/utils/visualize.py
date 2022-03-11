@@ -65,13 +65,16 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
 
     for i, tlwh in enumerate(faces):
         x1, y1, w, h = tlwh
+        x1 = max(0, x1 - 15)
+        y1 = max(0, y1 - 15)
+        w = w + 30
+        h = h + 30
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
         face1 = transform(face).to('cuda')
         out = facemodel(face1.unsqueeze(0))
-        # softmax_output = torch.softmax(out, dim=-1)
-        # prob = softmax_output[0][1].item
-        prob = torch.exp(out[0][1]).item()
+        softmax_output = torch.softmax(out, dim=-1)
+        prob = softmax_output[0][0].item()
         color = (255, 255, 0)
         if prob < 0.5:
             color = (0, 0, 255)
