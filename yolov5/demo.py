@@ -18,6 +18,7 @@ from utils.augmentations import letterbox
 from utils.plots import Annotator
 
 from facemask.mobilenetv2 import MobileNetV2
+from facemask.mobilienetv3 import mobilenetv3
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -163,6 +164,7 @@ class Predictor(object):
             timer.toc()
         return outputs, img_info
 
+
 def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
@@ -182,14 +184,26 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    face_model = MobileNetV2(num_classes=2)
-    face_model.load_state_dict(torch.load('facemask/mobilenetv2_facemask.pt', map_location='cuda'))
+    # face_model = MobileNetV2(num_classes=2)
+    # face_model.load_state_dict(torch.load('facemask/mobilenetv2_facemask.pt', map_location='cpu'))
+    # face_model.eval()
+    # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
+    # transform = transforms.Compose([
+    #     # transforms.ToPILImage(),
+    #     transforms.ToTensor(),
+    #     transforms.Resize(224),
+    #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    # ])
+    checkpoint = torch.load('facemask/mask_detection.pth.tar')
+    model = mobilenetv3().cuda()
+    model.load_state_dict(checkpoint['state_dict'])
+    model.eval()
+    model.cuda()
     transform = transforms.Compose([
-    # transforms.ToPILImage(),
-    transforms.ToTensor(),
-    transforms.Resize(224),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+        transforms.Resize(96),
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
     timer = Timer()
     frame_id = 0
     while True:
@@ -226,7 +240,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, face_model, transform, frame_id=frame_id + 1,
-                                        fps=1. / timer.average_time)
+                                          fps=1. / timer.average_time)
             else:
                 timer.toc()
                 online_im = img_info['raw_img']

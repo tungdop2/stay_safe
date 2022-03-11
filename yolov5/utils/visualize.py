@@ -4,6 +4,7 @@
 
 import cv2
 import numpy as np
+import torch
 
 __all__ = ["vis"]
 
@@ -68,10 +69,12 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
         face1 = transform(face).to('cuda')
         out = facemodel(face1.unsqueeze(0))
-        out = out.cpu().detach().numpy()
-        out = np.argmax(out)
+        # out = out.cpu().detach().numpy()
+        # out = np.argmax(out)
+        softmax_output = torch.softmax(out, dim=-1)
+        prob = softmax_output[0][1].item()
         color = (255, 255, 0)
-        if out == 1:
+        if prob < 0.5:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
