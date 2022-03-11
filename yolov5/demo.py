@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 import torch
-
+import torchvision.transforms as transforms
 
 from utils.visualize import plot_tracking
 from tracker.byte_tracker import BYTETracker
@@ -16,6 +16,8 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 from utils.plots import Annotator
+
+from facemask.mobilenetv2 import MobileNetV2
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -180,6 +182,14 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
+    face_model = MobileNetV2(num_classes=2)
+    face_model.load_state_dict(torch.load('facemask/mobilenetv2_facemask.pt', map_location='cuda'))
+    transform = transforms.Compose([
+    # transforms.ToPILImage(),
+    transforms.ToTensor(),
+    transforms.Resize(224),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
     timer = Timer()
     frame_id = 0
     while True:
@@ -214,13 +224,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
                 faces_tlwhs[:, 2] = faces_tlwhs[:, 2] * img_info['width'] / test_size[1]
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
-                # crop faces
-                for face_id, face in enumerate(faces_tlwhs[:1]):
-                    face_img = frame[int(face[1]):int(face[1] + face[3]), int(face[0]):int(face[0] + face[2])]
-                    if face_img.shape[0] * face_img.shape[1] > 0:
-                        cv2.imwrite(os.path.join(save_folder, 'face_' + str(face_id) + '_' + str(frame_id) + '.jpg'), face_img)
                 timer.toc()
-                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, frame_id=frame_id + 1,
+                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, face_model, transform, frame_id=frame_id + 1,
                                         fps=1. / timer.average_time)
             else:
                 timer.toc()
