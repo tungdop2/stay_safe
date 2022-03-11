@@ -195,13 +195,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     # ])
     checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
-    model = mobilenetv3()
-    model.load_state_dict(checkpoint['state_dict'])
-    model.to('cuda' if args.device == 'gpu' else 'cpu')
-    model.eval()
+    face_model = mobilenetv3()
+    face_model.load_state_dict(checkpoint['state_dict'])
+    face_model.to('cuda' if args.device == 'gpu' else 'cpu')
+    face_model.eval()
     transform = transforms.Compose([
-        transforms.Resize(96),
         transforms.ToTensor(),
+        transforms.Resize(96),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
     timer = Timer()
