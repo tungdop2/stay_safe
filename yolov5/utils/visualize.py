@@ -65,11 +65,6 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
 
     for i, tlwh in enumerate(faces):
         x1, y1, w, h = tlwh
-        if w < 22:
-            x1 = max(0, x1 - 5)
-            y1 = max(0, y1 - 5)
-            w = w + 10
-            h = h + 10
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
         face1 = transform(face).to('cuda')
