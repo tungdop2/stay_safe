@@ -73,7 +73,7 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         out = facemodel(face1.unsqueeze(0))
         softmax_output = torch.softmax(out, dim=-1)
         # print(softmax_output)
-        prob = softmax_output[0][0].item()
+        prob = softmax_output[0][1].item()
         color = (255, 255, 0)
         if prob < 0.49:
             color = (0, 0, 255)
