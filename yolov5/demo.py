@@ -17,7 +17,6 @@ from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 from utils.plots import Annotator
 
-from facemask.mobilenetv2 import MobileNetV2
 from facemask.mobilienetv3 import mobilenetv3
 
 
@@ -184,16 +183,6 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    # face_model = MobileNetV2(num_classes=2)
-    # face_model.load_state_dict(torch.load('facemask/mobilenetv2_facemask.pt', map_location='cpu'))
-    # face_model.eval()
-    # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
-    # transform = transforms.Compose([
-    #     # transforms.ToPILImage(),
-    #     transforms.ToTensor(),
-    #     transforms.Resize(224),
-    #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    # ])
     checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
     face_model = mobilenetv3()
     face_model.load_state_dict(checkpoint['state_dict'])
