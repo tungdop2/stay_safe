@@ -18,7 +18,6 @@ from utils.augmentations import letterbox
 from utils.plots import Annotator
 
 from facemask.mobilienetv3 import mobilenetv3
-from facemask.cnn32 import CNN
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -184,15 +183,14 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    # checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
-    # face_model = mobilenetv3()
-    # face_model.load_state_dict(checkpoint['state_dict'])
-    face_model = torch.load('facemask/cnn32.pt', map_location='cpu')
+    checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
+    face_model = mobilenetv3()
+    face_model.load_state_dict(checkpoint['state_dict'])
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize(32),
+        transforms.Resize((96, 96)),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
     timer = Timer()
