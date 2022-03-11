@@ -94,8 +94,12 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         #             thickness=text_thickness)
 
     radius = max(5, int(im_w/140.))
-    cv2.putText(im, 'frame: %d fps: %.2f num: %d' % (frame_id, fps, len(heads)),
-                (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), thickness=2)
+    cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
+                (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=2)
+    text_color = (0, 255, 0)
+    if len(heads) > 6:
+        text_color = (0, 0, 255)
+    cv2.putText(im, 'Person: %d' % len(heads), (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=2)
     return im
 
 
