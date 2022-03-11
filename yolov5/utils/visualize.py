@@ -67,8 +67,8 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         x1, y1, w, h = tlwh
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
-        if (w > 32 and h > 32):
-            cv2.imwrite('./runs/track/test/face_{}_{}.jpg'.format(frame_id, i), face)
+        # if (w > 32 and h > 32):
+        #     cv2.imwrite('./runs/track/test/face_{}_{}.jpg'.format(frame_id, i), face)
         face1 = transform(face).to('cuda')
         out = facemodel(face1.unsqueeze(0))
         softmax_output = torch.softmax(out, dim=-1)
