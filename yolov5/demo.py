@@ -194,11 +194,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     #     transforms.Resize(224),
     #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     # ])
-    checkpoint = torch.load('facemask/mask_detection.pth.tar')
-    model = mobilenetv3().cuda()
+    checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
+    model = mobilenetv3()
     model.load_state_dict(checkpoint['state_dict'])
+    model.to('cuda' if args.device == 'gpu' else 'cpu')
     model.eval()
-    model.cuda()
     transform = transforms.Compose([
         transforms.Resize(96),
         transforms.ToTensor(),
