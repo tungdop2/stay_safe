@@ -252,7 +252,7 @@ def main(args):
     if ret_val:
         h, w = frame.shape[:2]
         # print(h, w)
-        if (h * 9 > w * 5):
+        if (h / w >= 0.57):
             test_size = (int(1088 / w * h) + 1, 1088)
     
 
