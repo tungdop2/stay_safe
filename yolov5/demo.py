@@ -1,3 +1,4 @@
+from tabnanny import check
 from loguru import logger
 import numpy as np
 
@@ -18,7 +19,6 @@ from utils.augmentations import letterbox
 from utils.plots import Annotator
 
 from facemask.mobilienetv3 import mobilenetv3
-from facemask.cnn32 import CNN
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -185,24 +185,15 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     tracker = BYTETracker(args, frame_rate=30)
     # checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
-    # face_model = mobilenetv3()
-    # face_model.load_state_dict(checkpoint['state_dict'])
-    # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
-    # face_model.eval()
-    # transform = transforms.Compose([
-    #     transforms.ToTensor(),
-    #     transforms.Resize((96, 96)),
-    #     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    # ])
-    checkpoint = torch.load('facemask/cnn32.pt', map_location='cpu')
-    face_model = CNN(2)
+    checkpoint = torch.load('facemask/best_epoch.pt', map_location='cpu')
+    face_model = mobilenetv3()
     face_model.load_state_dict(checkpoint)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((32, 32)),
-        # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        transforms.Resize((96, 96)),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
     timer = Timer()
     frame_id = 0
