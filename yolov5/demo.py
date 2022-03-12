@@ -16,9 +16,8 @@ import os
 import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
-from utils.plots import Annotator
 
-from facemask.mobilienetv3 import mobilenetv3
+from facemask.CNN import ResNet9, ResNet15
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -184,16 +183,18 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')['state_dict']
+    checkpoint = torch.load('facemask/state_dict_resnet15', map_location='cpu')['state_dict']
     # checkpoint = torch.load('facemask/best_epoch.pt', map_location='cpu')
-    face_model = mobilenetv3()
+    face_model = ResNet15(1, 2)
     face_model.load_state_dict(checkpoint)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = transforms.Compose([
+        transforms.Resize((130, 130)),
+        transforms.CenterCrop(128),
+        transforms.Grayscale(1),
         transforms.ToTensor(),
-        transforms.Resize((96, 96)),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        transforms.Normalize(0.5, 0.5)
     ])
     timer = Timer()
     frame_id = 0
