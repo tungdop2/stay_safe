@@ -51,7 +51,6 @@ def make_parser():
     )
     parser.add_argument("--conf", default=0.001, type=float, help="test conf")
     parser.add_argument("--nms", default=0.45, type=float, help="test nms threshold")
-    parser.add_argument("--tsize", default=(574, 1088), type=tuple, help="test image size")
     parser.add_argument(
         "--fp16",
         dest="fp16",
@@ -59,14 +58,6 @@ def make_parser():
         action="store_true",
         help="Adopting mix precision evaluating.",
     )
-    parser.add_argument(
-        "--trt",
-        dest="trt",
-        default=False,
-        action="store_true",
-        help="Using TensorRT model for testing.",
-    )
-    # tracking args
     parser.add_argument("--track_thresh", type=float, default=0.4, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
@@ -95,7 +86,6 @@ class Predictor(object):
         model,
         # exp,
         num_classes, conf_thresh, nms_thresh, test_size,
-        trt_file=None,
         device="cpu",
         fp16=False
     ):
@@ -106,14 +96,6 @@ class Predictor(object):
         self.test_size = test_size
         self.device = device
         self.fp16 = fp16
-        if trt_file is not None:
-            from torch2trt import TRTModule
-
-            model_trt = TRTModule()
-            model_trt.load_state_dict(torch.load(trt_file))
-
-            x = torch.ones(1, 3, test_size[0], test_size[1]).cuda()
-            self.model(x)
 
     def inference(self, img, timer):
         img_info = {"id": 0}
@@ -207,7 +189,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
-                # print(img_info['height'], img_info['width'], test_size)
+                print(img_info['height'], img_info['width'], test_size)
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_targets))
                 online_tlwhs = []
@@ -252,14 +234,10 @@ def main(args):
     vis_folder = os.path.join(file_name, "track")
     os.makedirs(vis_folder, exist_ok=True)
 
-    if args.trt:
-        args.device = "gpu"
-
     logger.info("Args: {}".format(args))
 
     conf_thresh = args.conf
     nms_thresh = args.nms
-    test_size = args.tsize
 
     ckpt_file = args.ckpt
     model = DetectMultiBackend(ckpt_file, device='cuda')
@@ -267,18 +245,17 @@ def main(args):
         model.model.half()
     model.eval()
 
-    if args.trt:
-        assert not args.fuse, "TensorRT model is not support model fusing!"
-        trt_file = os.path.join(file_name, "model_trt.pth")
-        assert os.path.exists(
-            trt_file
-        ), "TensorRT model is not found!\n Run python3 tools/trt.py first!"
-        model.head.decode_in_inference = False
-        logger.info("Using TensorRT to inference")
-    else:
-        trt_file = None
+    # get 1st frame of video for test_size
+    test_size = (608, 1088)
+    cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
+    ret_val, frame = cap.read()
+    if ret_val:
+        h, w = frame.shape[:2]
+        if (w > 1088):
+            test_size = (int(1088 / w * h) + 1, 1088)
 
-    predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, trt_file, args.device, args.fp16)
+
+    predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
     current_time = time.localtime()
     imageflow_demo(predictor, vis_folder, current_time, args, test_size)
 
