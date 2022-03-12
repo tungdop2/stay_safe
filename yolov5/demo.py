@@ -190,10 +190,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = transforms.Compose([
-        transforms.Resize((130, 130)),
-        transforms.CenterCrop(128),
-        transforms.Grayscale(1),
         transforms.ToTensor(),
+        transforms.Resize((128, 128)),
+        transforms.Grayscale(1),
         transforms.Normalize(0.5, 0.5)
     ])
     timer = Timer()

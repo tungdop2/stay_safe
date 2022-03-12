@@ -45,7 +45,7 @@ class ResNet9(nn.Module):
             nn.MaxPool2d(16), #After pooling 512*1*1
             nn.Flatten(), # 512
             nn.Linear(512, num_classes),
-            nn.LogSoftmax()
+            nn.LogSoftmax(dim=1)
             )
 
     def forward(self,x):
@@ -95,7 +95,7 @@ class ResNet15(nn.Module):
             nn.Linear(512,128),
             nn.ReLU(),
             nn.Linear(128,num_classes),
-            nn.LogSoftmax()
+            nn.LogSoftmax(dim=1)
             )
 
     def forward(self,x):
