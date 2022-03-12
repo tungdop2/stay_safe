@@ -49,9 +49,9 @@ def make_parser():
         type=str,
         help="device to run our model, can either be cpu or gpu",
     )
-    parser.add_argument("--conf", default=0.1, type=float, help="test conf")
+    parser.add_argument("--conf", default=0.001, type=float, help="test conf")
     parser.add_argument("--nms", default=0.45, type=float, help="test nms threshold")
-    parser.add_argument("--tsize", default=(608, 1088), type=tuple, help="test image size")
+    parser.add_argument("--tsize", default=(574, 1088), type=tuple, help="test image size")
     parser.add_argument(
         "--fp16",
         dest="fp16",
@@ -67,7 +67,7 @@ def make_parser():
         help="Using TensorRT model for testing.",
     )
     # tracking args
-    parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.4, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=0, help='filter out tiny boxes')
@@ -207,6 +207,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
+                # print(img_info['height'], img_info['width'], test_size)
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_targets))
                 online_tlwhs = []
