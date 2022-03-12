@@ -251,8 +251,10 @@ def main(args):
     ret_val, frame = cap.read()
     if ret_val:
         h, w = frame.shape[:2]
-        if (w > 1088):
+        # print(h, w)
+        if (h / w > 0.55):
             test_size = (int(1088 / w * h) + 1, 1088)
+    
 
 
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
