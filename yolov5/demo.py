@@ -184,8 +184,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    # checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')
-    checkpoint = torch.load('facemask/best_epoch.pt', map_location='cpu')
+    checkpoint = torch.load('facemask/mask_detection.pth.tar', map_location='cpu')['state_dict']
+    # checkpoint = torch.load('facemask/best_epoch.pt', map_location='cpu')
     face_model = mobilenetv3()
     face_model.load_state_dict(checkpoint)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
