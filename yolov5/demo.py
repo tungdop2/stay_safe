@@ -137,7 +137,7 @@ class Predictor(object):
             heads = [output for output in outputs if output[6] == 0]
             heads = np.array(heads)
             heads = torch.from_numpy(heads).to('cuda' if self.device == 'gpu' else 'cpu')
-            faces = [output for output in outputs if output[6] == 1 and output[4] > 0.4]
+            faces = [output for output in outputs if output[6] == 1 and output[4] > 0.7]
             faces = np.array(faces)
             faces = torch.from_numpy(faces).to('cuda' if self.device == 'gpu' else 'cpu')
 
