@@ -166,7 +166,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     tracker = BYTETracker(args, frame_rate=30)
     checkpoint = torch.load('facemask/state_dict_resnet9.pth', map_location='cpu')
-    # checkpoint = torch.load('facemask/best_epoch.pt', map_location='cpu')
+    # checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
     face_model = ResNet9(1, 2)
     face_model.load_state_dict(checkpoint)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
@@ -189,7 +189,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
-                print(img_info['height'], img_info['width'], test_size)
+                # print(img_info['height'], img_info['width'], test_size)
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_targets))
                 online_tlwhs = []
@@ -252,7 +252,7 @@ def main(args):
     if ret_val:
         h, w = frame.shape[:2]
         # print(h, w)
-        if (h / w >= 0.57):
+        if (h / w < 5.0 / 9.0):
             test_size = (int(1088 / w * h) + 1, 1088)
     
 
