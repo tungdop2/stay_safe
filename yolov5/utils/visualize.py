@@ -75,7 +75,7 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         # print(softmax_output)
         prob = softmax_output[0][0].item()
         color = (255, 255, 0)
-        if prob < 0.49:
+        if prob < 0.4:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
