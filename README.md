@@ -12,7 +12,7 @@ Second, allmost our code is borrowed from this resources:
 2.  [ByteTrack](https://github.com/ifzhang/ByteTrack) for tracking method.
 3.  [Ashborn-SM repo](https://github.com/Ashborn-SM/Face-Mask-Detection-Pytorch) for a simply mask classifier model.
 
-Finally, team spirit is the most important factor to win victory. Thank you for all your hard work. We did very well :>.
+Finally, team spirit is the most important factor to win victory. Thank you for all your hảd wỏk. We did very well :>.
 ## Contributors
 - [Dinh Thi Thanh Huyen]()
 - [Trinh Phan Mai Trang]()
