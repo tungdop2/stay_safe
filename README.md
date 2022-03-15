@@ -5,6 +5,10 @@
 ## Installation  
 ## Usage  
 ## Demo  
+### Demo link:
+| Google Colab demo |
+|:-:|
+|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wRSzvjsaP0NHlY9WtQ4KmgssU0zqfiJ-?usp=sharing)|
 ## Acknoledgements  
 First, cam on giang vien.  
 
