@@ -95,7 +95,7 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
     text_color = (0, 255, 0)
     if len(heads) > limit:
         text_color = (0, 0, 255)
-    cv2.putText(im, 'People: %d / %d' % len(heads) % limit, (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
+    cv2.putText(im, 'People: {} / {}'.format(len(heads), limit), (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
     return im
 
 

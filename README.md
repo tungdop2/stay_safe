@@ -6,8 +6,11 @@
 1. Require Python 3.6+
 2. Go to src/ folder and run  
     `pip install -r requirements.txt`
-## Usage  
+## Usage 
+1. Go to src/ folder and run  
+    `bash demo.sh <video path> <limit number of people>`  
 ## Demo  
+![Demo](demo/demo.gif)
 ### Demo link:
 | Google Colab demo |
 |:-:|
