@@ -5,8 +5,7 @@ else
     cd weights
     echo "download weight."
     gdown --id 1gglIwqxaH2iTvy6lZlXuAcMpd_U0GCUb
+    cd ..
 fi
 
-cd ..
-read var var1
-python3 src/demo.py video --device gpu --path $var --limit $var1
+python3 demo.py video --device gpu --path $1 --limit $2
