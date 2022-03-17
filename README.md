@@ -4,11 +4,12 @@
 ## Abstract  
 ## Installation  
 1. Require Python 3.6+
-2. Go to src/ folder and run  
+2. Go to src folder and run  
     `pip install -r requirements.txt`
-## Usage 
-1. Go to src/ folder and run  
+## Usage  
+Go to src folder and run   
     `bash demo.sh <video path> <limit number of people>`  
+The result will be saved in `src\runs\track\test\<video name>`  
 ## Demo  
 ![Demo](demo/demo.gif)
 ### Demo link:
