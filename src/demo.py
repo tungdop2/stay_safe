@@ -58,7 +58,7 @@ def make_parser():
         action="store_true",
         help="Adopting mix precision evaluating.",
     )
-    parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=0, help='filter out tiny boxes')
@@ -165,7 +165,6 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-    # checkpoint = torch.load('facemask/state_dict_resnet9.pth', map_location='cpu')
     checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
     face_model = ResNet9(1, 2)
     face_model.load_state_dict(checkpoint)
