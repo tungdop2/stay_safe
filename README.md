@@ -3,6 +3,9 @@
 
 ## Abstract  
 ## Installation  
+1. Require Python 3.6+
+2. Go to src/ folder and run  
+    `pip install -r requirements.txt`
 ## Usage  
 ## Demo  
 ### Demo link:

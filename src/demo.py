@@ -17,7 +17,7 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-from facemask.CNN import ResNet9, ResNet15
+from facemask.model import ResNet9
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
@@ -66,6 +66,7 @@ def make_parser():
         "--aspect_ratio_thresh", type=float, default=10,
         help="threshold for filtering out boxes of which aspect ratio are above the given value."
     )
+    parser.add_argument('--limit', type=int, default=10, help='limit people number')
     return parser
 
 
@@ -213,7 +214,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, face_model, transform, frame_id=frame_id + 1,
-                                          fps=1. / timer.average_time)
+                                          fps=1. / timer.average_time, limit=args.limit)
             else:
                 timer.toc()
                 online_im = img_info['raw_img']

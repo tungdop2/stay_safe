@@ -50,7 +50,7 @@ def get_color(idx):
     return color
 
 
-def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=None, frame_id=0, fps=0., ids2=None):
+def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=None, frame_id=0, fps=0., ids2=None, limit=10):
     im = np.ascontiguousarray(np.copy(image))
     im_h, im_w = im.shape[:2]
 
@@ -58,7 +58,7 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
 
     text_scale = max(1, image.shape[1] / 1600.)
     text_thickness = 2
-    line_thickness = max(1, int(image.shape[1] / 500.))
+    line_thickness = max(1, int(image.shape[1] / 1080.))
     # text_scale = 2
     # text_thickness = 2
     # line_thickness = 2
@@ -67,8 +67,6 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
         x1, y1, w, h = tlwh
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
-        # if (w > 32 and h > 32):
-        #     cv2.imwrite('./runs/track/test/face_{}_{}.jpg'.format(frame_id, i), face)
         face1 = transform(face).to('cuda')
         out = facemodel(face1.unsqueeze(0))
         softmax_output = torch.softmax(out, dim=-1)
@@ -95,9 +93,9 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)
     text_color = (0, 255, 0)
-    if len(heads) > 6:
+    if len(heads) > limit:
         text_color = (0, 0, 255)
-    cv2.putText(im, 'People: %d' % len(heads), (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
+    cv2.putText(im, 'People: %d / %d' % len(heads) % limit, (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
     return im
 
 
