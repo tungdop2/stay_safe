@@ -56,7 +56,7 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
 
     # top_view = np.zeros([im_w, im_w, 3], dtype=np.uint8) + 255
 
-    text_scale = max(1, image.shape[1] / 1600.)
+    text_scale = max(1, image.shape[1] / 1080.)
     text_thickness = 2
     line_thickness = max(1, int(image.shape[1] / 1080.))
     # text_scale = 2
