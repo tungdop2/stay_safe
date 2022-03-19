@@ -61,7 +61,7 @@ def make_parser():
     parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
-    parser.add_argument('--min-box-area', type=float, default=50, help='filter out tiny boxes')
+    parser.add_argument('--min-box-area', type=float, default=100, help='filter out tiny boxes')
     parser.add_argument(
         "--aspect_ratio_thresh", type=float, default=1.6,
         help="threshold for filtering out boxes of which aspect ratio are above the given value."
