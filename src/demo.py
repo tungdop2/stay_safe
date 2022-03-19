@@ -249,13 +249,13 @@ def main(args):
 
     # get 1st frame of video for test_size
     test_size = (608, 1088)
-    cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
-    ret_val, frame = cap.read()
-    if ret_val:
-        h, w = frame.shape[:2]
-        print(h, w)
-        if (h / w <= 5. / 9.):
-            test_size = (int(1088 / w * h) + 1, 1088)
+    # cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
+    # ret_val, frame = cap.read()
+    # if ret_val:
+    #     h, w = frame.shape[:2]
+    #     print(h, w)
+    #     if (h / w <= 5. / 9. and  (w >= 1600 or h > 1080)):
+    #         test_size = (int(1088 / w * h) + 1, 1088)
     print(test_size)
 
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
