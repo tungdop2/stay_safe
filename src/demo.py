@@ -204,12 +204,15 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 print('Face count:', len(online_faces))
                 faces_tlwhs = []
                 for t in online_faces:
-                    if t[2] * t[3] > args.min_box_area:
-                        face = img_info['raw_img'][int(t[1]):int(t[1] + t[3]), int(t[0]):int(t[0] + t[2])]
-                        face = transform(face).to('cuda' if args.device == 'gpu' else 'cpu')
-                        prob = face_model(face.unsqueeze(0))
+                    tlwh = t.tlwh
+                    if tlwh[2] * tlwh[3] > args.min_box_area:
+                        face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
+                        face = transform(face)
+                        face = face.unsqueeze(0)
+                        face = face.to('cuda' if args.device == 'gpu' else 'cpu')
+                        prob = face_model(face)
                         prob = torch.softmax(prob, dim=1)[0][0].item()
-                        faces_tlwhs.append([t[0], t[1], t[2], t[3], prob])
+                        faces_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], prob])
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'],
                                           heads=people_tlwhs, faces=faces_tlwhs, limit=args.limit,
@@ -251,7 +254,7 @@ def main(args):
     if ret_val:
         h, w = frame.shape[:2]
         print(h, w)
-        if (h / w <= 0.5):
+        if (h / w <= 5. / 9.):
             test_size = (int(1088 / w * h) + 1, 1088)
     print(test_size)
 
