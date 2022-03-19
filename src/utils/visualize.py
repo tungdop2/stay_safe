@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torchvision.transforms as transforms
 
-from ..facemask.model import ResNet9
+from facemask.model import ResNet9
 __all__ = ["vis"]
 
 
