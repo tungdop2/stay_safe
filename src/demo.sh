@@ -1,5 +1,5 @@
 if [ -f "weights/crowdhuman_yolov5m.pt" ]; then
-    echo "weight prepared."
+    echo "weight prepared"
 else
     mkdir -p weights
     cd weights
