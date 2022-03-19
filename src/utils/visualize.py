@@ -5,9 +5,7 @@
 import cv2
 import numpy as np
 import torch
-import torchvision.transforms as transforms
 
-from facemask.model import ResNet9
 __all__ = ["vis"]
 
 
@@ -52,7 +50,7 @@ def get_color(idx):
     return color
 
 
-def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=None, frame_id=0, fps=0., ids2=None, limit=10):
+def plot_tracking(image, heads, faces, facemodel, transform, scores=None, frame_id=0, fps=0., ids2=None, limit=10):
     im = np.ascontiguousarray(np.copy(image))
     im_h, im_w = im.shape[:2]
 
@@ -65,24 +63,12 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
     # text_thickness = 2
     # line_thickness = 2
 
-    checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
-    mask_model = ResNet9(1, 2)
-    mask_model.load_state_dict(checkpoint)
-    mask_model.to('cuda' if args.device == 'gpu' else 'cpu')
-    mask_model.eval()
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize((128, 128)),
-        transforms.Grayscale(1),
-        transforms.Normalize(0.5, 0.5)
-    ])
-
     for i, tlwh in enumerate(faces):
         x1, y1, w, h = tlwh
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
-        face = transform(face).to('cuda')
-        out = mask_model(face.unsqueeze(0))
+        face1 = transform(face).to('cuda')
+        out = facemodel(face1.unsqueeze(0))
         softmax_output = torch.softmax(out, dim=-1)
         # print(softmax_output)
         prob = softmax_output[0][0].item()
@@ -91,10 +77,10 @@ def plot_tracking(image, heads, obj_ids, faces, facemodel, transform, scores=Non
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
+    
     for i, tlwh in enumerate(heads):
         x1, y1, w, h = tlwh
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
-        obj_id = int(obj_ids[i])
         # id_text = '{} {:.2f}'.format(int(obj_id), scores[i]) if scores is not None else '{}'.format(int(obj_id))
         # if ids2 is not None:
         #     id_text = id_text + ', {}'.format(int(ids2[i]))

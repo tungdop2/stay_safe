@@ -166,7 +166,17 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
     tracker = BYTETracker(args, frame_rate=30)
-
+    checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
+    face_model = ResNet9(1, 2)
+    face_model.load_state_dict(checkpoint)
+    face_model.to('cuda' if args.device == 'gpu' else 'cpu')
+    face_model.eval()
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Resize((128, 128)),
+        transforms.Grayscale(1),
+        transforms.Normalize(0.5, 0.5)
+    ])
     timer = Timer()
     frame_id = 0
     while True:
@@ -202,10 +212,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
                 faces_tlwhs[:, 2] = faces_tlwhs[:, 2] * img_info['width'] / test_size[1]
                 faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
-                # 
                 timer.toc()
-                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, faces_tlwhs, frame_id=frame_id + 1,
-                                          fps=1. / timer.average_time, limit=args.limit)
+                online_im = plot_tracking(img_info['raw_img'],
+                                          heads=online_tlwhs, faces=faces_tlwhs, limit=args.limit,
+                                          facemodel=face_model, transform=transform,
+                                          frame_id=frame_id + 1, fps=1. / timer.average_time)
             else:
                 timer.toc()
                 online_im = img_info['raw_img']
@@ -245,8 +256,6 @@ def main(args):
         # print(h, w)
         if (h / w < 5.0 / 9.0):
             test_size = (int(1088 / w * h) + 1, 1088)
-    
-
 
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
     current_time = time.localtime()
