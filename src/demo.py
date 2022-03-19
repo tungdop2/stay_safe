@@ -197,7 +197,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     tlwh = t.tlwh
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                        people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3]], 1)
+                        people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
                 # face
                 faces_tlwhs = []
                 online_faces = outputs[1].cpu().numpy()
