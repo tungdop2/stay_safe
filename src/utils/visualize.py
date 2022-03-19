@@ -66,7 +66,7 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
     for i, face in enumerate(faces):
         x1, y1, w, h, prob = face
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
-        color = (0, 255, 0)
+        color = (255, 255, 0)
         if prob < 0.5:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
