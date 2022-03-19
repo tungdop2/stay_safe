@@ -58,7 +58,7 @@ def make_parser():
         action="store_true",
         help="Adopting mix precision evaluating.",
     )
-    parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=50, help='filter out tiny boxes')
@@ -165,7 +165,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     vid_writer = cv2.VideoWriter(
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
-    tracker = BYTETracker(args, frame_rate=30)
+    person_tracker = BYTETracker(args, frame_rate=30)
+    face_tracker = BYTETracker(args, frame_rate=30)
     checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
     face_model = ResNet9(1, 2)
     face_model.load_state_dict(checkpoint)
@@ -190,24 +191,18 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
                 # people
-                online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
-                print('People count:', len(online_targets))
+                online_people = person_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
+                print('People count:', len(online_people))
                 people_tlwhs = []
-                for t in online_targets:
+                for t in online_people:
                     tlwh = t.tlwh
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
                 # face
+                online_faces = face_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
+                print('Face count:', len(online_face))
                 faces_tlwhs = []
-                online_faces = outputs[1].cpu().numpy()
-                online_faces = online_faces[:, :4]
-                online_faces[:, 2] = online_faces[:, 2] - online_faces[:, 0]
-                online_faces[:, 3] = online_faces[:, 3] - online_faces[:, 1]
-                online_faces[:, 0] = online_faces[:, 0] * img_info['width'] / test_size[1]
-                online_faces[:, 1] = online_faces[:, 1] * img_info['height'] / test_size[0]
-                online_faces[:, 2] = online_faces[:, 2] * img_info['width'] / test_size[1]
-                online_faces[:, 3] = online_faces[:, 3] * img_info['height'] / test_size[0]
                 for t in online_faces:
                     if t[2] * t[3] > args.min_box_area:
                         face = img_info['raw_img'][int(t[1]):int(t[1] + t[3]), int(t[0]):int(t[0] + t[2])]
@@ -255,9 +250,10 @@ def main(args):
     ret_val, frame = cap.read()
     if ret_val:
         h, w = frame.shape[:2]
-        # print(h, w)
-        if (h / w < 5.0 / 9.0):
+        print(h, w)
+        if (h / w <= 0.5):
             test_size = (int(1088 / w * h) + 1, 1088)
+    print(test_size)
 
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
     current_time = time.localtime()
