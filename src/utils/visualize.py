@@ -50,11 +50,11 @@ def get_color(idx):
     return color
 
 
-def plot_tracking(image, heads, faces, facemodel, transform, scores=None, frame_id=0, fps=0., ids2=None, limit=10):
+def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
     im = np.ascontiguousarray(np.copy(image))
     im_h, im_w = im.shape[:2]
 
-    top_view = np.zeros([im_w, im_w, 3], dtype=np.uint8) + 255
+    # top_view = np.zeros([im_w, im_w, 3], dtype=np.uint8) + 255
 
     text_scale = max(1, image.shape[1] / 1600.)
     text_thickness = 2
@@ -63,31 +63,24 @@ def plot_tracking(image, heads, faces, facemodel, transform, scores=None, frame_
     # text_thickness = 2
     # line_thickness = 2
 
-    for i, tlwh in enumerate(faces):
-        x1, y1, w, h = tlwh
+    for i, face in enumerate(faces):
+        x1, y1, w, h, prob = face
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
-        face = im[intbox[1]:intbox[3], intbox[0]:intbox[2], :]
-        face1 = transform(face).to('cuda')
-        out = facemodel(face1.unsqueeze(0))
-        softmax_output = torch.softmax(out, dim=-1)
-        # print(softmax_output)
-        prob = softmax_output[0][0].item()
-        color = (255, 255, 0)
         if prob < 0.5:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
     
-    for i, tlwh in enumerate(heads):
-        x1, y1, w, h = tlwh
+    for i, person in enumerate(heads):
+        x1, y1, w, h, tag = person
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
         # id_text = '{} {:.2f}'.format(int(obj_id), scores[i]) if scores is not None else '{}'.format(int(obj_id))
         # if ids2 is not None:
         #     id_text = id_text + ', {}'.format(int(ids2[i]))
         color = (0, 255, 0)
+        if tag == 0:
+            color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-        # cv2.putText(im, id_text, (intbox[0], intbox[1]), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255),
-        #             thickness=text_thickness)
 
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)

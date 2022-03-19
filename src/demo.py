@@ -61,7 +61,7 @@ def make_parser():
     parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
-    parser.add_argument('--min-box-area', type=float, default=0, help='filter out tiny boxes')
+    parser.add_argument('--min-box-area', type=float, default=50, help='filter out tiny boxes')
     parser.add_argument(
         "--aspect_ratio_thresh", type=float, default=10,
         help="threshold for filtering out boxes of which aspect ratio are above the given value."
@@ -189,33 +189,35 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
-                # print(img_info['height'], img_info['width'], test_size)
+                # people
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_targets))
-                online_tlwhs = []
-                online_ids = []
-                online_scores = []
+                people_tlwhs = []
                 for t in online_targets:
                     tlwh = t.tlwh
-                    tid = t.track_id
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                        online_tlwhs.append(tlwh)
-                        online_ids.append(tid)
-                        online_scores.append(t.score)
+                        people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3]], 1)
                 # face
-                faces_tlwhs = outputs[1].cpu().numpy()
-                faces_tlwhs = faces_tlwhs[:, :4]
-                faces_tlwhs[:, 2] = faces_tlwhs[:, 2] - faces_tlwhs[:, 0]
-                faces_tlwhs[:, 3] = faces_tlwhs[:, 3] - faces_tlwhs[:, 1]
-                faces_tlwhs[:, 0] = faces_tlwhs[:, 0] * img_info['width'] / test_size[1]
-                faces_tlwhs[:, 1] = faces_tlwhs[:, 1] * img_info['height'] / test_size[0]
-                faces_tlwhs[:, 2] = faces_tlwhs[:, 2] * img_info['width'] / test_size[1]
-                faces_tlwhs[:, 3] = faces_tlwhs[:, 3] * img_info['height'] / test_size[0]
+                faces_tlwhs = []
+                online_faces = outputs[1].cpu().numpy()
+                online_faces = online_faces[:, :4]
+                online_faces[:, 2] = online_faces[:, 2] - online_faces[:, 0]
+                online_faces[:, 3] = online_faces[:, 3] - online_faces[:, 1]
+                online_faces[:, 0] = online_faces[:, 0] * img_info['width'] / test_size[1]
+                online_faces[:, 1] = online_faces[:, 1] * img_info['height'] / test_size[0]
+                online_faces[:, 2] = online_faces[:, 2] * img_info['width'] / test_size[1]
+                online_faces[:, 3] = online_faces[:, 3] * img_info['height'] / test_size[0]
+                for t in online_faces:
+                    if t[2] * t[3] > args.min_box_area:
+                        face = img_info['raw_img'][int(t[1]):int(t[1] + t[3]), int(t[0]):int(t[0] + t[2])]
+                        face = transform(face).to('cuda' if args.device == 'gpu' else 'cpu')
+                        prob = face_model(face.unsqueeze(0))
+                        prob = torch.softmax(prob, dim=1)[0][0].item()
+                        faces_tlwhs.append([t[0], t[1], t[2], t[3], prob])
                 timer.toc()
                 online_im = plot_tracking(img_info['raw_img'],
-                                          heads=online_tlwhs, faces=faces_tlwhs, limit=args.limit,
-                                          facemodel=face_model, transform=transform,
+                                          heads=people_tlwhs, faces=faces_tlwhs, limit=args.limit,
                                           frame_id=frame_id + 1, fps=1. / timer.average_time)
             else:
                 timer.toc()
