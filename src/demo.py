@@ -201,7 +201,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
                 # face
                 online_faces = face_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
-                print('Face count:', len(online_face))
+                print('Face count:', len(online_faces))
                 faces_tlwhs = []
                 for t in online_faces:
                     if t[2] * t[3] > args.min_box_area:
