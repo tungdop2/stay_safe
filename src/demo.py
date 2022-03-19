@@ -212,7 +212,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 faces_tlwhs = []
                 for t in online_faces:
                     tlwh = t.tlwh
-                    if tlwh[2] * tlwh[3] > args.min_box_area:
+                    if tlwh[2] * tlwh[3] > args.min_box_area and tlwh[0] > 0 and tlwh[1] > 0 and tlwh[2] < frame.shape[1] and tlwh[3] < frame.shape[0]:
                         face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
                         face = transform(face)
                         face = face.unsqueeze(0)
