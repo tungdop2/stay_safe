@@ -135,10 +135,17 @@ class Predictor(object):
             outputs = postprocess(outputs, self.num_classes, self.confthre, self.nmsthre)
             # print('after nms:', outputs[0].size())
             outputs = outputs[0].cpu().numpy()
-            heads = [output for output in outputs if output[6] == 0]
+            heads = []
+            faces = []
+            for output in outputs:
+                if output[6] == 0:
+                    heads.append(output)
+                else:
+                    faces.append(output)
+            # heads = [output for output in outputs if output[6] == 0]
             heads = np.array(heads)
             heads = torch.from_numpy(heads).to('cuda' if self.device == 'gpu' else 'cpu')
-            faces = [output for output in outputs if output[6] == 1]
+            # faces = [output for output in outputs if output[6] == 1]
             faces = np.array(faces)
             faces = torch.from_numpy(faces).to('cuda' if self.device == 'gpu' else 'cpu')
 
