@@ -138,7 +138,7 @@ class Predictor(object):
             heads = [output for output in outputs if output[6] == 0]
             heads = np.array(heads)
             heads = torch.from_numpy(heads).to('cuda' if self.device == 'gpu' else 'cpu')
-            faces = [output for output in outputs if output[6] == 1 and output[4] > 0.7]
+            faces = [output for output in outputs if output[6] == 1]
             faces = np.array(faces)
             faces = torch.from_numpy(faces).to('cuda' if self.device == 'gpu' else 'cpu')
 
@@ -200,7 +200,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
                 # face
-                online_faces = face_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
+                online_faces = face_tracker.update(outputs[1], [img_info['height'], img_info['width']], test_size)
                 print('Face count:', len(online_faces))
                 faces_tlwhs = []
                 for t in online_faces:
