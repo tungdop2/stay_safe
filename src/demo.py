@@ -212,16 +212,14 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 for i in range(len(people_tlwhs) - 1):
                     for j in range(i + 1, len(people_tlwhs)):
                         bc1 = [(people_tlwhs[i][0] + people_tlwhs[i][2]) / 2, people_tlwhs[i][3]]
-                        bc1 = np.array(bc1, dtype=np.float32)
                         bc2 = [(people_tlwhs[j][0] + people_tlwhs[j][2]) / 2, people_tlwhs[j][3]]
-                        bc2 = np.array(bc2, dtype=np.float32)
 
-                        bc1 = cv2.perspectiveTransform(np.array([[h]]), M)[0][0]
-                        bc2 = cv2.perspectiveTransform(np.array([[h]]), M)[0][0]
+                        bc1 = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
+                        bc2 = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
                         dw = np.abs(bc1[0] - bc2[0]) / w
                         dh = np.abs(bc1[1] - bc2[1]) / h
                         dist = np.sqrt(dw * dw + dh * dh)
-                        if dist < 1.5:
+                        if dist < 1.0:
                             people_tlwhs[i][4] = 0
                             people_tlwhs[j][4] = 0
 
