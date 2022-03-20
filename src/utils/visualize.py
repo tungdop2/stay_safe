@@ -84,7 +84,7 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         color = (0, 255, 0)
         if tag == 0:
             color = (0, 0, 255)
-        plt.plot(x1 + w / 2, y1 + h / 2, marker='ro')
+        plt.plot(x1 + w / 2, y1 + h / 2, 'ro')
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
     plt.savefig('frame{:06d}.png'.format(frame_id))
     plt.close()
