@@ -2,6 +2,7 @@
 > _Covid-negative but positive in loving you <3._
 
 ## Abstract  
+![Workflow](assets/workflow.png)
 ## Installation  
 1. Require Python 3.6+
 2. Go to src folder and run  
@@ -11,7 +12,7 @@ Go to src folder and run
     `bash demo.sh <video path> <limit number of people>`  
 The result will be saved in `src\runs\track\test\<video name>`  
 ## Demo  
-![Demo](demo/demo.gif)
+![Demo](assets/demo.gif)
 ### Demo link:
 | Google Colab demo |
 |:-:|
