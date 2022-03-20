@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import torch
 
+from matplotlib import pyplot as plt
+
 __all__ = ["vis"]
 
 
@@ -71,7 +73,8 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
-    
+    plt.xlim(0, im_w)
+    plt.ylim(0, im_h)
     for i, person in enumerate(heads):
         x1, y1, w, h, tag = person
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
@@ -81,7 +84,10 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         color = (0, 255, 0)
         if tag == 0:
             color = (0, 0, 255)
+        plt.plot(x1 + w / 2, y1 + h / 2, marker='ro')
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
+    plt.savefig('frame{:06d}.png'.format(frame_id))
+    plt.close()
 
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)
