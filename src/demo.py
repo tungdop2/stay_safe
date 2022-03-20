@@ -18,9 +18,11 @@ from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
 from facemask.model import ResNet9
+from distance.distance import M, w, h
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
+M = np.array(M)
 # device = "cpu"
 
 
@@ -197,6 +199,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
+
                 # people
                 online_people = person_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_people))
@@ -206,12 +209,20 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
+                # for i in range(len(people_tlwhs) - 1):
+                #     for j in range(i + 1, len(people_tlwhs)):
+                #         bc1 = (people_tlwhs[i][0] + people_tlwhs[i][2] / 2, people_tlwhs[i][1] + people_tlwhs[i][3])
+
                 # face
                 online_faces = face_tracker.update(outputs[1], [img_info['height'], img_info['width']], test_size)
                 print('Face count:', len(online_faces))
                 faces_tlwhs = []
                 for t in online_faces:
                     tlwh = t.tlwh
+                    tlwh[0] = max(0, tlwh[0] - 5)
+                    tlwh[1] = max(0, tlwh[1] - 5)
+                    tlwh[2] = min(img_info['width'] - tlwh[0], tlwh[2] + 10)
+                    tlwh[3] = min(img_info['height'] - tlwh[1], tlwh[3] + 10)
                     if tlwh[2] * tlwh[3] > args.min_box_area and tlwh[0] > 0 and tlwh[1] > 0 and tlwh[0] + tlwh[2] < img_info['width'] and tlwh[1] + tlwh[3] < img_info['height']:
                         face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
                         face = transform(face)
