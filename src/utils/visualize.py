@@ -83,7 +83,7 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         if tag == 0:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-        cv2.circle(im, (intbox[0] + intbox[2] // 2, intbox[1] + intbox[3]), 2, color=color, thickness=-1)
+        # cv2.circle(im, ((intbox[0] + intbox[2]) // 2, intbox[3]), 2, color=(255, 255, 255), thickness=-1)
 
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)

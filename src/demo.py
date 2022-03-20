@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 
 import torch
-import torchvision.transforms as transforms
 
 from utils.visualize import plot_tracking
 from tracker.byte_tracker import BYTETracker
@@ -17,7 +16,7 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-from facemask.model import ResNet9
+from facemask.model import face_mask_model, face_mask_transform
 from distance.distance import M, w, h
 
 
@@ -176,17 +175,15 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     person_tracker = BYTETracker(args, frame_rate=30)
     face_tracker = BYTETracker(args, frame_rate=30)
-    checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
-    face_model = ResNet9(1, 2)
-    face_model.load_state_dict(checkpoint)
+    # checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
+    # face_model = ResNet9(1, 2)
+    # face_model.load_state_dict(checkpoint)
+    # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
+    face_model = face_mask_model()
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize((128, 128)),
-        transforms.Grayscale(1),
-        transforms.Normalize(0.5, 0.5)
-    ])
+    transform = face_mask_transform()
+
     timer = Timer()
     frame_id = 0
     while True:
