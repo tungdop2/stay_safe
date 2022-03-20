@@ -28,7 +28,7 @@ Second, allmost our code is borrowed from these resources:
 Many thanks for their wonderful work.  
 
 Finally, team spirit is the most important factor to win victory. Thank you for all your hảd wỏk. We did very well :>.
-## Contributors
+## Team members
 - [Dinh Thi Thanh Huyen](https://github.com/dtthuyen)
 - [Trinh Phan Mai Trang](https://github.com/Trang2101)
-- [Duong Quang Tung](https://github.com/tungdop2) (Special thanks to the first one)
+- [Duong Quang Tung](https://github.com/tungdop2)
