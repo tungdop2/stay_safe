@@ -199,10 +199,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], -1])
 
-                for i in range(len(online_people) - 1):
-                    for j in range(i + 1, len(online_people)):
-                        bc1 = [online_people[i][0] + online_people[i][2] / 2, online_people[i][1] + online_people[i][3]]
-                        bc2 = [online_people[j][0] + online_people[j][2] / 2, online_people[j][1] + online_people[j][3]]
+                for i in range(len(people_tlwhs) - 1):
+                    for j in range(i + 1, len(people_tlwhs)):
+                        bc1 = [people_tlwhs[i][0] + people_tlwhs[i][2] / 2, people_tlwhs[i][1] + people_tlwhs[i][3]]
+                        bc2 = [people_tlwhs[j][0] + people_tlwhs[j][2] / 2, people_tlwhs[j][1] + people_tlwhs[j][3]]
 
                         bc1_ = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
                         bc2_ = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
@@ -210,8 +210,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                         dh = np.abs(bc1_[1] - bc2_[1]) / h_scale
                         dist = np.sqrt(dw * dw + dh * dh)
                         if dist < 1.5:
-                            online_people[i][4] = 0
-                            online_people[j][4] = 0
+                            people_tlwhs[i][4] = 0
+                            people_tlwhs[j][4] = 0
 
             if outputs[1] is not None:
                 # face
