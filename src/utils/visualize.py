@@ -10,8 +10,6 @@ from distance.distance import load_top_view_config
 
 __all__ = ["vis"]
 
-M = np.array(M)
-
 def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
 
     for i in range(len(boxes)):
@@ -74,6 +72,8 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
     M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
+    # M = np.array(M, dtype=np.float32)
+    # print(M , w_scale, h_scale)
     for i in range(len(heads) - 1):
         for j in range(i + 1, len(heads)):
             bc1 = [heads[i][0] + heads[i][2] / 2, heads[i][1] + heads[i][3]]
