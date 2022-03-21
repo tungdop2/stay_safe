@@ -20,7 +20,6 @@ from facemask.model import face_mask_model, face_mask_transform
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
-M = np.array(M)
 # device = "cpu"
 
 

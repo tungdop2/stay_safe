@@ -61,7 +61,7 @@ class ResNet9(nn.Module):
 
 
 def face_mask_model():
-    ckpt = torch.load('src/facemask/best_resnet9.pt', map_location='cpu')
+    ckpt = torch.load('facemask/best_resnet9.pt', map_location='cpu')
     model = ResNet9(1, 2)
     model.load_state_dict(ckpt)
     return model
