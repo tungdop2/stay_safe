@@ -9,6 +9,7 @@ def load_top_view_config(file):
         lines = [line.strip() for line in lines]
         M = np.zeros((3, 3))
         for i in range(3):
+            # print(lines[i].split(' '))
             M[i] = np.array(lines[i].split(' '))
 
         w_scale = float(lines[3])
