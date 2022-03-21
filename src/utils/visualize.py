@@ -80,8 +80,8 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
 
             bc1 = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
             bc2 = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
-            dw = np.abs(bc1[0] - bc2[0]) / w
-            dh = np.abs(bc1[1] - bc2[1]) / h
+            dw = np.abs(bc1[0] - bc2[0]) / w_scale
+            dh = np.abs(bc1[1] - bc2[1]) / h_scale
             dist = np.sqrt(dw * dw + dh * dh)
             if dist < 2.0:
                 heads[i][4] = 0

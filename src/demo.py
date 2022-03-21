@@ -17,7 +17,6 @@ from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
 from facemask.model import face_mask_model, face_mask_transform
-from distance.distance import M, w, h
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
