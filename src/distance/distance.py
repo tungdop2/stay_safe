@@ -1,6 +1,22 @@
-M = [[ 1.61315154e+00, -1.34169277e-01, -7.78490707e+02],
-       [-3.49815098e-02,  1.78988725e+00, -5.63843635e+01],
-       [-7.86822425e-05,  1.26031381e-03,  1.00000000e+00]]
+import os
+import numpy as np
 
-w_scale = 86.24348554628749
-h_scale = 48.474921984338046
+def load_top_view_config(file):
+    with open(file, 'r') as f:
+        lines = f.readlines()
+        lines = [line.strip() for line in lines]
+        M = np.zeros((3, 3))
+        for i in range(3):
+            M[i] = np.array(lines[i].split(', '))
+
+        w_scale = float(lines[3])
+        h_scale = float(lines[4])
+    
+    # print('M:', M)
+    # print('w_scale:', w_scale)
+    # print('h_scale:', h_scale)
+    return M, w_scale, h_scale
+
+if __name__ == '__main__':
+    # load_top_view_config('../config/top_view_config.txt')
+    load_top_view_config('src/distance/distance.txt')
