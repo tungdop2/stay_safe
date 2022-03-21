@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import torch
 
-from matplotlib import pyplot as plt
+from distance.distance import M, w_scale, h_scale
 
 __all__ = ["vis"]
 
@@ -36,7 +36,7 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
         cv2.rectangle(
             img,
             (x0, y0 + 1),
-            (x0 + txt_size[0] + 1, y0 + int(1.5*txt_size[1])),
+            (x0 + txt_size[0] + 1, y0 + int(1.5 * txt_size[1])),
             txt_bk_color,
             -1
         )
@@ -73,6 +73,22 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
 
+    for i in range(len(heads) - 1):
+        for j in range(i + 1, len(heads)):
+            bc1 = [(heads[i][0] + heads[i][2]) / 2, heads[i][3]]
+            bc2 = [(heads[j][0] + heads[j][2]) / 2, heads[j][3]]
+
+            bc1 = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
+            bc2 = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
+            dw = np.abs(bc1[0] - bc2[0]) / w
+            dh = np.abs(bc1[1] - bc2[1]) / h
+            dist = np.sqrt(dw * dw + dh * dh)
+            if dist < 2.0:
+                heads[i][4] = 0
+                heads[j][4] = 0
+                cv2.line(im, ((heads[i][0] + heads[i][2]) / 2, heads[i][3]), \
+                         ((heads[j][0] + heads[j][2]) / 2, heads[j][3]), (0, 0, 255), line_thickness)
+
     for i, person in enumerate(heads):
         x1, y1, w, h, tag = person
         intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
@@ -83,14 +99,14 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         if tag == 0:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-        # cv2.circle(im, ((intbox[0] + intbox[2]) // 2, intbox[3]), 2, color=(255, 255, 255), thickness=-1)
 
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)
     text_color = (0, 255, 0)
     if len(heads) > limit:
         text_color = (0, 0, 255)
-    cv2.putText(im, 'People: {} / {}'.format(len(heads), limit), (0, int(30 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
+    cv2.putText(im, 'People: {} / {}'.format(len(heads), limit), (0, int(30 * text_scale)),
+                cv2.FONT_HERSHEY_PLAIN, 2, text_color, thickness=text_thickness)
     return im
 
 
