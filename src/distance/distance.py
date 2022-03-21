@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import argparse
 
 def load_top_view_config(file):
     with open(file, 'r') as f:
@@ -65,18 +66,18 @@ def selectROI(event, x, y, flags, param):
         cv2.imshow("image", imagetmp)
 
 def printROI(M, w, h):
-    with open('distance1.txt', 'w') as f:
+    with open('distance.txt', 'w') as f:
         for i in range(3):
             f.write('{} {} {}\n'.format(M[i][0], M[i][1], M[i][2]))
         f.write(str(w) + '\n')
         f.write(str(h) + '\n')
 
-if __name__ == '__main__':
+def selectROIfromvideo(video_path):
     global imagetmp, roiPts, ct
     roiPts = np.zeros((6, 2), dtype="float32")
     ct = 0
 
-    vid = cv2.VideoCapture('1.mp4')
+    vid = cv2.VideoCapture(video_path)
     image = vid.read()[1]
     # image = cv2.imread("1.jpg")
     # cv2.imwrite("2.jpg", image)
@@ -86,12 +87,17 @@ if __name__ == '__main__':
     cv2.setMouseCallback("image", selectROI)
 
     M = None
-    warped = None
     while ct < 6:
         cv2.imshow("image", imagetmp)
         cv2.waitKey(500)
     cv2.destroyAllWindows()
 
     M, w, h = four_point_transform(imagetmp, roiPts)
-    printROI(M, w, h)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Select ROI from video')
+    parser.add_argument('--video_path', type=str, default='../../videos/test.mp4', help='video path')
+    args = parser.parse_args()
+    print(args.video_path)
+    selectROIfromvideo(args.video_path)
     

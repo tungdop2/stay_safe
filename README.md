@@ -8,9 +8,21 @@
 2. Go to src folder and run  
     `pip install -r requirements.txt`
 ## Usage  
-Go to src folder and run   
-    `bash demo.sh <video path> <limit number of people>`  
-The result will be saved in `src\runs\track\test\<video name>`  
+1. Go to src/distance folder and run  
+    ```bash
+    python distance.py <video path>
+    ```
+
+    First frame will be shown, then you have to click to choose 6 points:  
+      - First 4 points are the top-left, top-right, bottom-left, bottom-right corners of the ROI.  
+      - The last 2 points define distance in horizontal and vertical, which equals to 1 meter in the real world.  
+    
+    The result will to save to distance.txt.
+1. Go to src folder and run   
+    ```bash 
+    bash demo.sh <video path> <limit number of people>  
+    ```
+    The result will be saved in `src\runs\track\test\<video name>`  
 ## Demo  
 ![Demo](assets/demo.gif)
 ### Demo link:
@@ -32,3 +44,10 @@ Finally, team spirit is the most important factor to win victory. Thank you for 
 - [Dinh Thi Thanh Huyen](https://github.com/dtthuyen)
 - [Trinh Phan Mai Trang](https://github.com/Trang2101)
 - [Duong Quang Tung](https://github.com/tungdop2)
+
+## On-going work
+- [x] Person and head detection
+- [x] Add tracking method to improve detection performance
+- [x] Face mask classifier
+- [x] Top-view localization
+- [ ] Optimize the face mask classifier

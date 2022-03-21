@@ -71,23 +71,6 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         if prob < 0.7:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-    M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
-    # M = np.array(M, dtype=np.float32)
-    # print(M , w_scale, h_scale)
-    for i in range(len(heads) - 1):
-        for j in range(i + 1, len(heads)):
-            bc1 = [heads[i][0] + heads[i][2] / 2, heads[i][1] + heads[i][3]]
-            bc2 = [heads[j][0] + heads[j][2] / 2, heads[j][1] + heads[j][3]]
-
-            bc1_ = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
-            bc2_ = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
-            dw = np.abs(bc1_[0] - bc2_[0]) / w_scale
-            dh = np.abs(bc1_[1] - bc2_[1]) / h_scale
-            dist = np.sqrt(dw * dw + dh * dh)
-            if dist < 1.5:
-                heads[i][4] = 0
-                heads[j][4] = 0
-                cv2.line(im, tuple(map(int, bc1)), tuple(map(int, bc2)), (0, 0, 255), line_thickness)
 
     for i, person in enumerate(heads):
         x1, y1, w, h, tag = person
@@ -96,10 +79,10 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         # if ids2 is not None:
         #     id_text = id_text + ', {}'.format(int(ids2[i]))
         color = (0, 255, 0)
-        if tag == 0:
+        if tag != -1:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-        cv2.circle(im, (int(x1 + w / 2), int(y1 + h)), 2, color=(255, 255, 255), thickness=-1)
+        # cv2.circle(im, (int(x1 + w / 2), int(y1 + h)), 2, color=(255, 255, 255), thickness=-1)
 
     cv2.putText(im, 'frame: %d fps: %.2f' % (frame_id, fps),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), thickness=text_thickness)

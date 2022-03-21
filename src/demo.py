@@ -17,14 +17,14 @@ from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
 from facemask.model import face_mask_model, face_mask_transform
+from distance.distance import load_top_view_config
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 # device = "cpu"
 
-
 def make_parser():
-    parser = argparse.ArgumentParser("ByteTrack Demo!")
+    parser = argparse.ArgumentParser("3K Demo!")
     parser.add_argument(
         "demo", default="image", help="demo type, eg. video and webcam"
     )
@@ -60,7 +60,7 @@ def make_parser():
     parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
-    parser.add_argument('--min-box-area', type=float, default=100, help='filter out tiny boxes')
+    parser.add_argument('--min-box-area', type=float, default=400,  help='filter out tiny boxes')
     parser.add_argument(
         "--aspect_ratio_thresh", type=float, default=1.6,
         help="threshold for filtering out boxes of which aspect ratio are above the given value."
@@ -116,7 +116,7 @@ class Predictor(object):
         img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
 
-        img = torch.from_numpy(img).cuda()
+        img = torch.from_numpy(img).to('cuda' if self.device == "gpu" else 'cpu')
         img = img.half() if self.fp16 else img.float()  # uint8 to fp16/32
         img /= 255  # 0 - 255 to 0.0 - 1.0
         # print(img)
@@ -173,15 +173,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     person_tracker = BYTETracker(args, frame_rate=30)
     face_tracker = BYTETracker(args, frame_rate=30)
-    # checkpoint = torch.load('facemask/best_resnet9.pt', map_location='cpu')
-    # face_model = ResNet9(1, 2)
-    # face_model.load_state_dict(checkpoint)
-    # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model = face_mask_model()
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = face_mask_transform()
-
+    M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
     timer = Timer()
     frame_id = 0
     while True:
@@ -192,9 +188,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
         if ret_val:
             outputs, img_info = predictor.inference(frame, timer)
 
-            # for i, det in enumerate(outputs):
             if outputs[0] is not None:
-
                 # people
                 online_people = person_tracker.update(outputs[0], [img_info['height'], img_info['width']], test_size)
                 print('People count:', len(online_people))
@@ -203,21 +197,23 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     tlwh = t.tlwh
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                        people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], 1])
-                # for i in range(len(people_tlwhs) - 1):
-                #     for j in range(i + 1, len(people_tlwhs)):
-                #         bc1 = [(people_tlwhs[i][0] + people_tlwhs[i][2]) / 2, people_tlwhs[i][3]]
-                #         bc2 = [(people_tlwhs[j][0] + people_tlwhs[j][2]) / 2, people_tlwhs[j][3]]
+                        people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], -1])
 
-                #         bc1 = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
-                #         bc2 = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
-                #         dw = np.abs(bc1[0] - bc2[0]) / w
-                #         dh = np.abs(bc1[1] - bc2[1]) / h
-                #         dist = np.sqrt(dw * dw + dh * dh)
-                #         if dist < 1.0:
-                #             people_tlwhs[i][4] = 0
-                #             people_tlwhs[j][4] = 0
+                for i in range(len(online_people) - 1):
+                    for j in range(i + 1, len(online_people)):
+                        bc1 = [online_people[i][0] + online_people[i][2] / 2, online_people[i][1] + online_people[i][3]]
+                        bc2 = [online_people[j][0] + online_people[j][2] / 2, online_people[j][1] + online_people[j][3]]
 
+                        bc1_ = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
+                        bc2_ = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
+                        dw = np.abs(bc1_[0] - bc2_[0]) / w_scale
+                        dh = np.abs(bc1_[1] - bc2_[1]) / h_scale
+                        dist = np.sqrt(dw * dw + dh * dh)
+                        if dist < 1.5:
+                            online_people[i][4] = 0
+                            online_people[j][4] = 0
+
+            if outputs[1] is not None:
                 # face
                 online_faces = face_tracker.update(outputs[1], [img_info['height'], img_info['width']], test_size)
                 print('Face count:', len(online_faces))
@@ -265,22 +261,12 @@ def main(args):
     nms_thresh = args.nms
 
     ckpt_file = args.ckpt
-    model = DetectMultiBackend(ckpt_file, device='cuda')
+    model = DetectMultiBackend(ckpt_file, device='cuda' if args.device == 'gpu' else 'cpu')
     if args.fp16:
         model.model.half()
     model.eval()
 
-    # get 1st frame of video for test_size
     test_size = (608, 1088)
-    # cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
-    # ret_val, frame = cap.read()
-    # if ret_val:
-    #     h, w = frame.shape[:2]
-    #     print(h, w)
-    #     if (h / w <= 5. / 9. and  (w >= 1600 or h > 1080)):
-    #         test_size = (int(1088 / w * h) + 1, 1088)
-    print(test_size)
-
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
     current_time = time.localtime()
     imageflow_demo(predictor, vis_folder, current_time, args, test_size)
