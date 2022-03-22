@@ -11,7 +11,7 @@
 ## Usage  
 1. Go to src/distance folder and run  
     ```bash
-    python distance.py <video path>
+    python distance.py --video path
     ```
 
     First frame will be shown, then you have to click to choose 6 points:  
