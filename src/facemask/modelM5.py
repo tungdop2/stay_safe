@@ -30,7 +30,7 @@ class ModelM5(nn.Module):
         return logits
     def forward(self, x):
         logits = self.get_logits(x)
-        return F.softmax(logits, dim=1)
+        return logits
 
 def face_mask_model():
     ckpt = torch.load('facemask/best_m5.pt', map_location='cpu')
