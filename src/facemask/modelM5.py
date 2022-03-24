@@ -33,7 +33,7 @@ class ModelM5(nn.Module):
         return logits
 
 def face_mask_model():
-    ckpt = torch.load('facemask/best_m5.pt', map_location='cpu')
+    ckpt = torch.load('facemask/best_m5_1.pt', map_location='cpu')
     model = ModelM5()
     model.load_state_dict(ckpt)
     return model

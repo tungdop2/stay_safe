@@ -81,16 +81,16 @@ def selectROIfromvideo(video_path):
     vid = cv2.VideoCapture(video_path)
     image = vid.read()[1]
     # image = cv2.imread("1.jpg")
-    cv2.imwrite("2.jpg", image)
-    imagetmp = cv2.resize(image, (1600, 1600 * image.shape[0] // image.shape[1]))
-    # imagetmp = image.copy()
+    # imagetmp = cv2.resize(image, (1600, 1600 * image.shape[0] // image.shape[1]))
+    imagetmp = image.copy()
+    # cv2.imwrite("2.jpg", imagetmp)
     cv2.namedWindow("image")
     cv2.setMouseCallback("image", selectROI)
 
     M = None
     while ct < 6:
         cv2.imshow("image", imagetmp)
-        cv2.moveWindow("image", -200, -200)
+        # cv2.moveWindow("image", -100, -100)
         cv2.waitKey(500)
     cv2.imwrite("tmp.jpg", imagetmp)
     cv2.destroyAllWindows()
