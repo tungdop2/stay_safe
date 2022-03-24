@@ -82,8 +82,8 @@ def selectROIfromvideo(video_path):
     image = vid.read()[1]
     # image = cv2.imread("1.jpg")
     cv2.imwrite("2.jpg", image)
-    imagetmp = cv2.resize(image, (1280, 1280 * image.shape[0] // image.shape[1]))
-    # imagetmp = image.copy()
+    # imagetmp = cv2.resize(image, (1280, 1280 * image.shape[0] // image.shape[1]))
+    imagetmp = image.copy()
     cv2.namedWindow("image")
     cv2.setMouseCallback("image", selectROI)
 
