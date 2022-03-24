@@ -90,6 +90,7 @@ def selectROIfromvideo(video_path):
     M = None
     while ct < 6:
         cv2.imshow("image", imagetmp)
+        cv2.moveWindow("image", -200, -200)
         cv2.waitKey(500)
     cv2.imwrite("tmp.jpg", imagetmp)
     cv2.destroyAllWindows()

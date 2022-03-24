@@ -20,6 +20,8 @@ from utils.augmentations import letterbox
 from facemask.modelM5 import face_mask_model, face_mask_transform
 from distance.distance import load_top_view_config
 
+from matplotlib import pyplot as plt
+
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 # device = "cpu"
@@ -199,7 +201,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         people_tlwhs.append([tlwh[0], tlwh[1], tlwh[2], tlwh[3], -1])
-
+                
+                plt.set_xlim([-5, 5])
+                plt.set_ylim([-5, 5])
                 for i in range(len(people_tlwhs) - 1):
                     for j in range(i + 1, len(people_tlwhs)):
                         bc1 = [people_tlwhs[i][0] + people_tlwhs[i][2] / 2, people_tlwhs[i][1] + people_tlwhs[i][3]]
@@ -207,6 +211,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
 
                         bc1_ = cv2.perspectiveTransform(np.array([[bc1]]), M)[0][0]
                         bc2_ = cv2.perspectiveTransform(np.array([[bc2]]), M)[0][0]
+                        plt.plot([bc1_[0], bc2_[0]], 'ro')
+                        plt.plot([bc1_[0], bc2_[0]], 'ro')
                         dw = np.abs(bc1_[0] - bc2_[0]) / w_scale
                         dh = np.abs(bc1_[1] - bc2_[1]) / h_scale
                         dist = np.sqrt(dw * dw + dh * dh)
