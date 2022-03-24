@@ -219,6 +219,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                         if dist < 1.5:
                             people_tlwhs[i][4] = 0
                             people_tlwhs[j][4] = 0
+                plt.savefig(os.path.join(vis_folder, '{}_people.png'.format(frame_id)))
+                plt.close()
 
             if outputs[1] is not None:
                 # face
