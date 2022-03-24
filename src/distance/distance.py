@@ -56,7 +56,7 @@ def selectROI(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         roiPts[ct] = np.array([x, y], dtype="float32")
         ct += 1
-        cv2.circle(imagetmp, (x, y), 2, (0, 255, 0) if ct < 4 else (0, 0, 255), -1)
+        cv2.circle(imagetmp, (x, y), 2 if ct < 4 else 4, (0, 255, 0) if ct < 4 else (0, 0, 255), -1)
         # cv2.imshow("image", imagetmp)
         if ct == 4:
             cv2.line(imagetmp, (int(roiPts[0][0]), int(roiPts[0][1])), (int(roiPts[1][0]), int(roiPts[1][1])), (0, 255, 0), 2)
@@ -90,8 +90,8 @@ def selectROIfromvideo(video_path):
     M = None
     while ct < 6:
         cv2.imshow("image", imagetmp)
-        cv2.imwrite("tmp.jpg", imagetmp)
         cv2.waitKey(500)
+    cv2.imwrite("tmp.jpg", imagetmp)
     cv2.destroyAllWindows()
 
     M, w, h = four_point_transform(imagetmp, roiPts)

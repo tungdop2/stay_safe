@@ -223,7 +223,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                     tlwh = t.tlwh
                     if tlwh[2] * tlwh[3] > args.min_box_area and tlwh[0] > 0 and tlwh[1] > 0 and tlwh[0] + tlwh[2] < img_info['width'] and tlwh[1] + tlwh[3] < img_info['height']:
                         face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
-                        cv2.imwrite(f'{args.save_folder}/{frame_id}_{i}.jpg', face)
+                        cv2.imwrite(f'{frame_id}_{i}.jpg', face)
                         face = transform(face)
                         face = face.unsqueeze(0)
                         face = face.to('cuda' if args.device == 'gpu' else 'cpu')
