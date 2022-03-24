@@ -6,7 +6,8 @@
 ![Workflow](assets/workflow.png)
 ## Installation  
 1. Require Python 3.6+
-2. Go to src folder and run  
+2. Clone this repository
+3. Go to src folder and run  
     `pip install -r requirements.txt`
 ## Usage  
 1. Go to src/distance folder and run  
@@ -36,7 +37,6 @@ First, cam on giang vien.
 Second, allmost our code is borrowed from these resources:
 1.  [YOLOv5](https://github.com/ultralytics/yolov5) and [deepakcrk's pretrained weights](https://github.com/deepakcrk/yolov5-crowdhuman) for head & person detection.
 2.  [ByteTrack](https://github.com/ifzhang/ByteTrack) for tracking method.
-3.  [Ashborn-SM repo](https://github.com/Ashborn-SM/Face-Mask-Detection-Pytorch) for a simply mask classifier model.
    
 Many thanks for their wonderful work.  
 
