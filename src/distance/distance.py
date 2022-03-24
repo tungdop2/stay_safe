@@ -67,7 +67,7 @@ def selectROI(event, x, y, flags, param):
         cv2.imshow("image", imagetmp)
 
 def printROI(M, w, h):
-    with open('distance1.txt', 'w') as f:
+    with open('distance.txt', 'w') as f:
         for i in range(3):
             f.write('{} {} {}\n'.format(M[i][0], M[i][1], M[i][2]))
         f.write(str(w) + '\n')
@@ -82,8 +82,8 @@ def selectROIfromvideo(video_path):
     image = vid.read()[1]
     # image = cv2.imread("1.jpg")
     cv2.imwrite("2.jpg", image)
-    # imagetmp = cv2.resize(image, (1280, 1280 * image.shape[0] // image.shape[1]))
-    imagetmp = image.copy()
+    imagetmp = cv2.resize(image, (1600, 1600 * image.shape[0] // image.shape[1]))
+    # imagetmp = image.copy()
     cv2.namedWindow("image")
     cv2.setMouseCallback("image", selectROI)
 
@@ -95,6 +95,7 @@ def selectROIfromvideo(video_path):
     cv2.destroyAllWindows()
 
     M, w, h = four_point_transform(imagetmp, roiPts)
+    printROI(M, w, h)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Select ROI from video')
