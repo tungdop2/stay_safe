@@ -16,8 +16,7 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-# from facemask.model import face_mask_model, face_mask_transform
-from facemask.modelM5 import face_mask_model, face_mask_transform
+from facemask.modelM3 import face_mask_model, face_mask_transform
 from distance.distance import load_top_view_config
 
 
