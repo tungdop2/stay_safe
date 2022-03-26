@@ -50,5 +50,6 @@ Finally, team spirit is the most important factor to win victory. Thank you for 
 - [x] Person and head detection
 - [x] Add tracking method to improve detection performance
 - [x] Face mask classifier
-- [x] Top-view localization
+- [x] Top-view localization and distance estimation
 - [ ] Optimize the face mask classifier
+- [ ] Train more yolov5 models at more scale
