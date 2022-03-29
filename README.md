@@ -20,7 +20,9 @@
       - The last 2 points define distance in horizontal and vertical, which equals to 1 meter in the real world.  
     
     The result will to save to distance.txt.
-1. Go to src folder and run   
+2. Go to src folder and download pretrained weights for YOLOv5, make sure pt files in weights folder.
+    [Google drive link](https://drive.google.com/file/d/1SsAI7wf-hfIAO2kY9yvQWFQXADxSilMN/view?usp=sharing)
+3. Go to src folder and run   
     ```bash 
     bash demo.sh <video path> <limit number of people>  
     ```
