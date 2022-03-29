@@ -68,7 +68,7 @@ def initialize_weights(m):
 def face_mask_model(pretrained=None):
     model = ModelM3()
     if pretrained is not None:
-        ckpt = torch.load('facemask/best_m3.pt', map_location='cpu')
+        ckpt = torch.load('facemask/best_epoch_1.pt', map_location='cpu')
         model.load_state_dict(ckpt)
     else:
         model.apply(initialize_weights)
