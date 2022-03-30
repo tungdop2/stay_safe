@@ -263,7 +263,7 @@ def main(args):
         model.model.half()
     model.eval()
 
-    if args.ckpt.contains('yolov5s'):
+    if args.ckpt.find('yolov5s') != -1:
         test_size = (416, 416)
     else:
         test_size = (608, 1088)
