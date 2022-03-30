@@ -263,10 +263,10 @@ def main(args):
         model.model.half()
     model.eval()
 
-    if args.ckpt.find('yolov5s') != -1:
-        test_size = (416, 416)
-    else:
-        test_size = (608, 1088)
+    # if args.ckpt.find('yolov5s') != -1:
+    #     test_size = (416, 416)
+    # else:
+    test_size = (608, 1088)
     predictor = Predictor(model, 2, conf_thresh, nms_thresh, test_size, args.device, args.fp16)
     current_time = time.localtime()
     imageflow_demo(predictor, vis_folder, current_time, args, test_size)
