@@ -16,7 +16,8 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-from facemask.modelM3 import face_mask_model, face_mask_transform
+# from facemask.modelM3 import face_mask_model, face_mask_transform
+from facemask.resnet import resnet18, face_mask_transform
 from distance.distance import load_top_view_config
 
 
@@ -41,7 +42,7 @@ def make_parser():
         help="save name for results txt/video",
     )
 
-    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5s.pt", type=str, help="ckpt for eval")
+    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5m.pt", type=str, help="ckpt for eval")
     parser.add_argument(
         "--device",
         default="gpu",
@@ -173,7 +174,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     person_tracker = BYTETracker(args, frame_rate=30)
     face_tracker = BYTETracker(args, frame_rate=30)
-    face_model = face_mask_model()
+    # face_model = face_mask_model()
+    face_model = resnet18()
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     transform = face_mask_transform()
