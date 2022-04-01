@@ -17,7 +17,7 @@ from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
 # from facemask.modelM3 import face_mask_model, face_mask_transform
-from facemask.resnet import resnet18, face_mask_transform
+from facemask.resnet import resnet9, face_mask_transform
 from distance.distance import load_top_view_config
 
 

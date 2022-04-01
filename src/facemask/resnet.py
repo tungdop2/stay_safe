@@ -69,5 +69,5 @@ def face_mask_transform():
 def resnet9():
     model = ResNet9(1, 2)
     ckpt = 'facemask/best_resnet9.pt'
-    model.load_state_dict(torch.load(ckpt, map_location=cpu))
+    model.load_state_dict(torch.load(ckpt, map_location='cpu'))
     return model
