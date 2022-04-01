@@ -1,3 +1,4 @@
+import re
 from tabnanny import check
 from loguru import logger
 import numpy as np
@@ -16,7 +17,6 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-# from facemask.modelM3 import face_mask_model, face_mask_transform
 from facemask.resnet import resnet9, face_mask_transform
 from distance.distance import load_top_view_config
 
@@ -179,7 +179,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     # face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.cuda()
     face_model.eval()
-    transform = face_mask_transform()
+    transform = resnet9.model_transform()
     M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
     timer = Timer()
     frame_id = 0
