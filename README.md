@@ -20,8 +20,7 @@
       - The last 2 points define distance in horizontal and vertical, which equals to 1 meter in the real world.  
     
     The result will to save to distance.txt.
-2. Go to src folder and download pretrained weights for YOLOv5, make sure pt files in weights folder.
-    [Google drive link](https://drive.google.com/file/d/1SsAI7wf-hfIAO2kY9yvQWFQXADxSilMN/view?usp=sharing)
+2. Go to src folder and download [pretrained weights](https://drive.google.com/file/d/1SsAI7wf-hfIAO2kY9yvQWFQXADxSilMN/view?usp=sharing) for YOLOv5, make sure pt files in weights folder.
 3. Go to src folder and run   
     ```bash 
     bash demo.sh <video path> <limit number of people>  
@@ -39,6 +38,7 @@ First, cam on giang vien.
 Second, allmost our code is borrowed from these resources:
 1.  [YOLOv5](https://github.com/ultralytics/yolov5) and [deepakcrk's pretrained weights](https://github.com/deepakcrk/yolov5-crowdhuman) for head & person detection.
 2.  [ByteTrack](https://github.com/ifzhang/ByteTrack) for tracking method.
+3.  [ansh941's code](https://github.com/ansh941/MnistSimpleCNN) for a simple classifier model.
    
 Many thanks for their wonderful work.  
 
