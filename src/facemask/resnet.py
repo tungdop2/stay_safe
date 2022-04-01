@@ -20,7 +20,7 @@ def conv_block(in_channels, out_channels, pooling=False):
             conv_layers.add_module('max_pooling',nn.MaxPool2d(2))
         return conv_layers
 
-class ResNet9(nn.Module):
+class ResNet9x128(nn.Module):
     def __init__(self, in_channels, num_classes):
         super().__init__()
 
@@ -67,7 +67,7 @@ def face_mask_transform():
     ])
 
 def resnet9():
-    model = ResNet9(1, 2)
-    ckpt = 'facemask/best_resnet9.pt'
+    model = ResNet9x128(1, 2)
+    ckpt = 'facemask/x128.pt'
     model.load_state_dict(torch.load(ckpt, map_location='cpu'))
     return model
