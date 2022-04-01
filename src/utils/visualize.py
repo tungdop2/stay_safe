@@ -71,6 +71,8 @@ def plot_tracking(image, heads, faces, frame_id=0, fps=0., limit=10):
         if prob < 0.5:
             color = (0, 0, 255)
         cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
+        cv2.putText(im, '{:.2f}'.format(prob), (intbox[0], intbox[1] - 5),
+                    cv2.FONT_HERSHEY_SIMPLEX, text_scale, color, text_thickness)
 
     for i, person in enumerate(heads):
         x1, y1, w, h, tag = person
