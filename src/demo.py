@@ -224,10 +224,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 for i, t in enumerate(online_faces):
                     tlwh = t.tlwh
                     if tlwh[2] * tlwh[3] > args.min_box_area and tlwh[0] > 0 and tlwh[1] > 0 and tlwh[0] + tlwh[2] < img_info['width'] and tlwh[1] + tlwh[3] < img_info['height']:
-                        # tlwh[0] = max(0, tlwh[0] - 5)
-                        # tlwh[1] = max(0, tlwh[1] - 5)
-                        # tlwh[2] = min(img_info['width'] - tlwh[0], tlwh[2] + 10)
-                        # tlwh[3] = min(img_info['height'] - tlwh[1], tlwh[3] + 10)
+                        tlwh[0] = max(0, tlwh[0] - 2)
+                        tlwh[1] = max(0, tlwh[1] - 2)
+                        tlwh[2] = min(img_info['width'] - tlwh[0], tlwh[2] + 4)
+                        tlwh[3] = min(img_info['height'] - tlwh[1], tlwh[3] + 4)
                         face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
                         # cv2.imwrite(f'{frame_id}_{i}.jpg', face)
                         face = transform(face)
