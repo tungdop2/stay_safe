@@ -104,7 +104,7 @@ def model(size=128):
         model = ResNet9x128(1, 2)
     elif size == 64:
         model = ResNet9x64(1, 2)
-    ckpt = 'facemask/x{}.pth'.format(size)
+    ckpt = 'facemask/x{}.pt'.format(size)
     model.load_state_dict(torch.load(ckpt, map_location='cpu'))
     return model, transforms.Compose([
         transforms.ToTensor(),
