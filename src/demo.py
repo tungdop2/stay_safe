@@ -42,7 +42,7 @@ def make_parser():
         help="save name for results txt/video",
     )
 
-    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5m.pt", type=str, help="ckpt for eval")
+    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5n.pt", type=str, help="ckpt for eval")
     parser.add_argument(
         "--device",
         default="gpu",
