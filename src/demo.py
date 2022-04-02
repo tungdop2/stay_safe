@@ -17,7 +17,7 @@ import time
 from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
 
-from facemask.resnet import resnet9x128
+from facemask.resnet import model
 from distance.distance import load_top_view_config
 
 
@@ -174,7 +174,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     person_tracker = BYTETracker(args, frame_rate=30)
     face_tracker = BYTETracker(args, frame_rate=30)
-    face_model, transform = resnet9x128()
+    face_model, transform = model(64)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
