@@ -99,13 +99,16 @@ class ResNet9x64(nn.Module):
         out = self.linear(res2)
         return out
 
-def resnet9x128():
-    model = ResNet9x128(1, 2)
-    ckpt = 'facemask/x128.pt'
+def model(size=128):
+    if size == 128:
+        model = ResNet9x128(1, 2)
+    elif size == 64:
+        model = ResNet9x64(1, 2)
+    ckpt = 'facemask/resnet9x{}.pth'.format(size)
     model.load_state_dict(torch.load(ckpt, map_location='cpu'))
     return model, transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((128, 128)),
+        transforms.Resize((size, size)),
         transforms.Grayscale(1),
         transforms.Normalize(0.5, 0.5)
     ])
