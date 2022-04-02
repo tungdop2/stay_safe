@@ -42,7 +42,7 @@ def make_parser():
         help="save name for results txt/video",
     )
 
-    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5n.pt", type=str, help="ckpt for eval")
+    parser.add_argument("-c", "--ckpt", default="weights/crowdhuman_yolov5s.pt", type=str, help="ckpt for eval")
     parser.add_argument(
         "--device",
         default="gpu",
@@ -58,7 +58,7 @@ def make_parser():
         action="store_true",
         help="Adopting mix precision evaluating.",
     )
-    parser.add_argument("--track_thresh", type=float, default=0.65, help="tracking confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=400,  help='filter out tiny boxes')
