@@ -26,8 +26,8 @@ class ResNet9(nn.Module):
         super().__init__()
 
         # 1st Block
-        self.conv1 = conv_block(in_channels, size/2)  # input size 1*128*128
-        self.conv2 = conv_block(size / 2, size , True)  # After pooling 64*64*64
+        self.conv1 = conv_block(in_channels, int(size / 2))  # input size 1*128*128
+        self.conv2 = conv_block(int(size / 2), size , True)  # After pooling 64*64*64
         # Residual layer
         self.res1 = nn.Sequential(conv_block(size, size), conv_block(size, size))
 
@@ -39,7 +39,7 @@ class ResNet9(nn.Module):
 
         # Linear Network
         self.linear = nn.Sequential(
-            nn.MaxPool2d(size / 8),  # After pooling 512*1*1
+            nn.MaxPool2d(int(size / 8)),  # After pooling 512*1*1
             nn.Flatten(),  # 512
             nn.Linear(size * 4, num_classes),
         )
