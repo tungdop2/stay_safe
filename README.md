@@ -38,7 +38,6 @@ First, cam on giang vien.
 Second, allmost our code is borrowed from these resources:
 1.  [YOLOv5](https://github.com/ultralytics/yolov5) and [deepakcrk's pretrained weights](https://github.com/deepakcrk/yolov5-crowdhuman) for head & person detection.
 2.  [ByteTrack](https://github.com/ifzhang/ByteTrack) for tracking method.
-3.  [ansh941's code](https://github.com/ansh941/MnistSimpleCNN) for a simple classifier model.
    
 Many thanks for their wonderful work.  
 
