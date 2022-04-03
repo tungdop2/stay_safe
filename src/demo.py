@@ -174,7 +174,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
     )
     person_tracker = BYTETracker(args, frame_rate=30)
     face_tracker = BYTETracker(args, frame_rate=30)
-    face_model, transform = model(128)
+    face_model, transform = model(64)
     face_model.to('cuda' if args.device == 'gpu' else 'cpu')
     face_model.eval()
     M, w_scale, h_scale = load_top_view_config('distance/distance.txt')
@@ -221,10 +221,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 for i, t in enumerate(online_faces):
                     tlwh = t.tlwh
                     if tlwh[2] * tlwh[3] > args.min_box_area and tlwh[0] > 0 and tlwh[1] > 0 and tlwh[0] + tlwh[2] < img_info['width'] and tlwh[1] + tlwh[3] < img_info['height']:
-                        tlwh[0] = max(0, tlwh[0] - int(256 / tlwh[2]))
-                        tlwh[1] = max(0, tlwh[1] - int(256 / tlwh[3]))
-                        tlwh[2] = min(img_info['width'] - tlwh[0], tlwh[2] + int(512 / tlwh[2]))
-                        tlwh[3] = min(img_info['height'] - tlwh[1], tlwh[3] + int(512 / tlwh[3]))
+                        tlwh[0] = max(0, tlwh[0] - int(128 / tlwh[2]))
+                        tlwh[1] = max(0, tlwh[1] - int(128 / tlwh[3]))
+                        tlwh[2] = min(img_info['width'] - tlwh[0], tlwh[2] + int(256 / tlwh[2]))
+                        tlwh[3] = min(img_info['height'] - tlwh[1], tlwh[3] + int(256 / tlwh[3]))
                         face = frame[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])]
                         # cv2.imwrite(f'{frame_id}_{i}.jpg', face)
                         face = transform(face)

@@ -65,37 +65,37 @@ class ResNet9x64(nn.Module):
     def __init__(self, in_channels, num_classes):
         super().__init__()
 
-        # 1st Block
-        self.conv1 = conv_block(in_channels, 64)  # input size 1*128*128
-        self.conv2 = conv_block(64, 128, True)  # After pooling 64*64*64
-        # Residual layer
-        self.res1 = nn.Sequential(conv_block(128, 128), conv_block(128, 128))
-
-        # 2nd Block
-        self.conv3 = conv_block(128, 256, True)  # After pooling 256*32*32
-        self.conv4 = conv_block(256, 512, True)  # After pooling 512*16*16
-        # Residual layer
-        self.res2 = nn.Sequential(conv_block(512, 512), conv_block(512, 512))
-
-        # Linear Network
+        #1st Block
+        self.conv1 = conv_block(in_channels, 32)#input size 1*64*64
+        self.conv2 = conv_block(32, 64, True) #After pooling 32*32*32
+        #Residual layer
+        self.res1 = nn.Sequential(conv_block(64, 64), conv_block(64, 64))
+        
+        #2nd Block
+        self.conv3 = conv_block(64, 128, True) #After pooling 128*16*16
+        self.conv4 = conv_block(128, 256, True) #After pooling 256*8*8
+        #Residual layer
+        self.res2 = nn.Sequential(conv_block(256, 256), conv_block(256, 256))
+        
+        #Linear Network
         self.linear = nn.Sequential(
-            nn.MaxPool2d(16),  # After pooling 512*1*1
-            nn.Flatten(),  # 512
-            nn.Linear(512, num_classes),
-        )
+            nn.MaxPool2d(8), #After pooling 256*1*1
+            nn.Flatten(), # 256
+            nn.Linear(256, num_classes),
+            )
 
-    def forward(self, x):
-        # Block-1
+    def forward(self,x):
+        #Block-1
         out = self.conv1(x)
         out = self.conv2(out)
         res1 = self.res1(out) + out
 
-        # #Block-2
+        #Block-2
         out = self.conv3(res1)
         out = self.conv4(out)
         res2 = self.res2(out) + out
 
-        # #Linear network
+        #Linear network
         out = self.linear(res2)
         return out
 
