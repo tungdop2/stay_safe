@@ -209,7 +209,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                         dw = np.abs(bc1_[0] - bc2_[0]) / w_scale
                         dh = np.abs(bc1_[1] - bc2_[1]) / h_scale
                         dist = np.sqrt(dw * dw + dh * dh)
-                        if dist < 1.5:
+                        if dist <= 1:
                             people_tlwhs[i][4] = 0
                             people_tlwhs[j][4] = 0
 
@@ -243,9 +243,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args, test_size):
                 online_im = img_info['raw_img']
             vid_writer.write(online_im)
             # cv2.imshow("online_im", online_im)
-            ch = cv2.waitKey(1)
-            if ch == 27 or ch == ord("q") or ch == ord("Q"):
-                break
+            # ch = cv2.waitKey(1)
+            # if ch == 27 or ch == ord("q") or ch == ord("Q"):
+            #     break
         else:
             break
         frame_id += 1
